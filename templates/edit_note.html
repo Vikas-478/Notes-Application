@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Edit Note</title>
+
+    <link
+        rel="stylesheet"
+        href="{{ url_for('static', filename='style.css') }}"
+    >
+</head>
+
+<body>
+
+<div class="auth-page">
+
+    <div class="auth-card">
+
+        <div class="brand">
+            <div class="brand-icon">N</div>
+
+            <div>
+                <strong>Notes</strong>
+                <small>Workspace</small>
+            </div>
+        </div>
+
+        <p class="eyebrow">EDIT NOTE</p>
+
+        <h1 class="auth-heading">
+            Update your note
+        </h1>
+
+        <p>
+            Make your changes and save the note.
+        </p>
+
+
+        <form method="POST">
+
+            <div class="input-group">
+
+                <label>Title</label>
+
+                <input
+                    type="text"
+                    name="title"
+                    value="{{ note['title'] }}"
+                    required
+                >
+
+            </div>
+
+
+            <div class="input-group">
+
+                <label>Category</label>
+
+                <select name="category">
+
+                    <option
+                        value="Personal"
+                        {% if note['category'] == 'Personal' %}selected{% endif %}
+                    >
+                        Personal
+                    </option>
+
+                    <option
+                        value="Work"
+                        {% if note['category'] == 'Work' %}selected{% endif %}
+                    >
+                        Work
+                    </option>
+
+                    <option
+                        value="Study"
+                        {% if note['category'] == 'Study' %}selected{% endif %}
+                    >
+                        Study
+                    </option>
+
+                    <option
+                        value="Ideas"
+                        {% if note['category'] == 'Ideas' %}selected{% endif %}
+                    >
+                        Ideas
+                    </option>
+
+                </select>
+
+            </div>
+
+
+            <div class="input-group">
+
+                <label>Content</label>
+
+                <textarea
+                    name="content"
+                    rows="8"
+                    required
+                >{{ note['content'] }}</textarea>
+
+            </div>
+
+
+            <button
+                type="submit"
+                class="primary-btn"
+            >
+                Save Changes
+            </button>
+
+        </form>
+
+
+        <div class="auth-footer">
+
+            <a href="/dashboard">
+                ← Back to Dashboard
+            </a>
+
+        </div>
+
+    </div>
+
+</div>
+
+</body>
+</html>

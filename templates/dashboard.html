@@ -1,0 +1,441 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Notes — Dashboard</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='style.css') }}">
+</head>
+
+<body>
+
+<div class="dashboard-page">
+
+    <!-- ================= SIDEBAR ================= -->
+    <aside class="sidebar">
+
+        <div class="brand">
+            <div class="brand-icon">N</div>
+
+            <div>
+                <strong>Notes</strong>
+                <small>Workspace</small>
+            </div>
+        </div>
+
+        <nav class="sidebar-nav">
+
+            <a href="/dashboard">
+                <span>⌂</span>
+                <span>All Notes</span>
+            </a>
+
+            <a href="#" onclick="return false;">
+                <span>★</span>
+                <span>Favorites</span>
+            </a>
+
+            <a href="#" onclick="return false;">
+                <span>▣</span>
+                <span>Trash</span>
+            </a>
+
+        </nav>
+
+        <div class="sidebar-user">
+            <div class="sidebar-user-name">
+                {{ user_name }}
+            </div>
+
+            <div class="sidebar-user-role">
+                My account
+            </div>
+
+            <a href="{{ url_for('logout') }}"
+               style="
+               display:block;
+               margin-top:10px;
+               color:#635bff;
+               text-decoration:none;
+               font-size:13px;
+               font-weight:700;
+               ">
+                Sign Out
+            </a>
+        </div>
+
+    </aside>
+
+
+    <!-- ================= MAIN CONTENT ================= -->
+    <main class="main-content">
+
+        <!-- TOP -->
+        <div class="dashboard-top">
+
+            <div class="dashboard-title">
+                <h1>Good to see you, {{ user_name }} 👋</h1>
+
+                <p>
+                    Keep your thoughts organized and save what matters.
+                </p>
+            </div>
+
+
+            <div class="dashboard-actions">
+
+                <div class="search-box">
+                    <input
+                        type="text"
+                        id="searchInput"
+                        placeholder="Search notes..."
+                        autocomplete="off"
+                    >
+                </div>
+
+                <button
+                    type="button"
+                    class="add-note-btn"
+                    onclick="openModal()">
+                    + Create Note
+                </button>
+
+            </div>
+
+        </div>
+
+
+        <!-- ================= STATS ================= -->
+        <div class="stats-grid">
+
+            <div class="stat-card">
+                <small>Total Notes</small>
+                <strong>{{ notes|length }}</strong>
+            </div>
+
+            <div class="stat-card">
+                <small>Workspace</small>
+                <strong>Personal</strong>
+            </div>
+
+            <div class="stat-card">
+                <small>Status</small>
+                <strong style="font-size:20px;">
+                    Active
+                </strong>
+            </div>
+
+        </div>
+
+
+        <!-- ================= NOTES HEADER ================= -->
+        <div class="notes-header">
+
+            <h2>Your Notes</h2>
+
+            <span>
+                {{ notes|length }} note{% if notes|length != 1 %}s{% endif %}
+            </span>
+
+        </div>
+
+
+        <!-- ================= NOTES ================= -->
+        <div class="notes-grid" id="notesGrid">
+
+            {% for note in notes %}
+
+            <article
+                class="note-card"
+                data-title="{{ note['title']|lower }}"
+                data-content="{{ note['content']|lower }}"
+                data-category="{{ note['category']|lower }}"
+            >
+
+                <div class="note-card-top">
+
+                    <span class="note-tag">
+                        {{ note["category"] }}
+                    </span>
+
+                    <div class="note-actions">
+
+                        <a
+                            href="{{ url_for('edit_note', note_id=note['id']) }}"
+                            class="edit-btn">
+                            Edit
+                        </a>
+
+                        <form
+                            method="POST"
+                            action="{{ url_for('delete_note', note_id=note['id']) }}"
+                            onsubmit="return confirm('Are you sure you want to delete this note?');"
+                            style="margin:0;">
+
+                            <button
+                                type="submit"
+                                class="delete-btn">
+                                Delete
+                            </button>
+
+                        </form>
+
+                    </div>
+
+                </div>
+
+
+                <h4>
+                    {{ note["title"] }}
+                </h4>
+
+
+                <p>
+                    {{ note["content"] }}
+                </p>
+
+
+                <div class="note-footer">
+
+                    <span>
+                        {{ note["created_at"] }}
+                    </span>
+
+                </div>
+
+            </article>
+
+
+            {% else %}
+
+            <div class="empty-state">
+
+                <div style="
+                    font-size:42px;
+                    margin-bottom:15px;
+                    opacity:.7;
+                ">
+                    📝
+                </div>
+
+                <h3>No notes yet</h3>
+
+                <p>
+                    Create your first note and start building your workspace.
+                </p>
+
+                <button
+                    type="button"
+                    class="add-note-btn"
+                    onclick="openModal()"
+                    style="margin-top:20px;">
+                    + Create your first note
+                </button>
+
+            </div>
+
+            {% endfor %}
+
+        </div>
+
+    </main>
+
+</div>
+
+
+<!-- =====================================================
+     CREATE NOTE MODAL
+     ===================================================== -->
+
+<div
+    class="modal"
+    id="createNoteModal">
+
+    <div class="modal-content">
+
+        <div class="modal-header">
+
+            <h2>Create a new note</h2>
+
+            <button
+                type="button"
+                class="close-modal"
+                onclick="closeModal()">
+                ×
+            </button>
+
+        </div>
+
+
+        <form
+            method="POST"
+            action="{{ url_for('add_note') }}">
+
+            <div class="input-group">
+
+                <label for="title">
+                    Note Title
+                </label>
+
+                <input
+                    type="text"
+                    id="title"
+                    name="title"
+                    placeholder="Enter note title..."
+                    required>
+
+            </div>
+
+
+            <div class="input-group">
+
+                <label for="category">
+                    Category
+                </label>
+
+                <select
+                    id="category"
+                    name="category">
+
+                    <option value="Personal">
+                        Personal
+                    </option>
+
+                    <option value="Work">
+                        Work
+                    </option>
+
+                    <option value="Study">
+                        Study
+                    </option>
+
+                    <option value="Ideas">
+                        Ideas
+                    </option>
+
+                </select>
+
+            </div>
+
+
+            <div class="input-group">
+
+                <label for="content">
+                    Content
+                </label>
+
+                <textarea
+                    id="content"
+                    name="content"
+                    rows="7"
+                    placeholder="Start writing your note..."
+                    required></textarea>
+
+            </div>
+
+
+            <button
+                type="submit"
+                class="primary-btn">
+                Save Note
+            </button>
+
+        </form>
+
+    </div>
+
+</div>
+
+
+<!-- =====================================================
+     JAVASCRIPT
+     ===================================================== -->
+
+<script>
+
+const modal = document.getElementById("createNoteModal");
+
+function openModal() {
+    modal.classList.add("active");
+
+    setTimeout(() => {
+        const titleInput = document.getElementById("title");
+
+        if (titleInput) {
+            titleInput.focus();
+        }
+    }, 100);
+}
+
+
+function closeModal() {
+    modal.classList.remove("active");
+}
+
+
+/* Close when clicking outside */
+
+modal.addEventListener("click", function(event) {
+
+    if (event.target === modal) {
+        closeModal();
+    }
+
+});
+
+
+/* Close with Escape */
+
+document.addEventListener("keydown", function(event) {
+
+    if (event.key === "Escape") {
+        closeModal();
+    }
+
+});
+
+
+/* ================= SEARCH ================= */
+
+const searchInput =
+    document.getElementById("searchInput");
+
+const noteCards =
+    document.querySelectorAll(".note-card");
+
+
+searchInput.addEventListener("input", function() {
+
+    const query =
+        this.value.toLowerCase().trim();
+
+    noteCards.forEach(function(card) {
+
+        const title =
+            card.dataset.title || "";
+
+        const content =
+            card.dataset.content || "";
+
+        const category =
+            card.dataset.category || "";
+
+        const match =
+            title.includes(query) ||
+            content.includes(query) ||
+            category.includes(query);
+
+        card.style.display =
+            match ? "" : "none";
+
+    });
+
+});
+
+</script>
+
+</body>
+</html>
