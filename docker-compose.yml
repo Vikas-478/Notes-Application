@@ -1,0 +1,14 @@
+services:
+  notes-app:
+    build: .
+    container_name: notes-application
+    ports:
+      - "5000:5000"
+    environment:
+      - DATA_DIR=/app/data
+    volumes:
+      - notes-data:/app/data
+    restart: unless-stopped
+
+volumes:
+  notes-data:
