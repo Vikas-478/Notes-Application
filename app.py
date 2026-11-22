@@ -6,7 +6,8 @@ app = Flask(__name__)
 
 app.secret_key = "notes-app-secret-key"
 
-DATABASE = "notes.db"
+import os
+DATABASE = os.path.join(os.getenv("DATA_DIR", "."), "notes.db")
 
 
 # =========================
@@ -14,6 +15,7 @@ DATABASE = "notes.db"
 # =========================
 
 def get_db():
+    os.makedirs(os.path.dirname(DATABASE) or ".", exist_ok=True)
     conn = sqlite3.connect(DATABASE)
     conn.row_factory = sqlite3.Row
     return conn
@@ -352,4 +354,6 @@ if __name__ == "__main__":
 
     init_db()
 
-    app.run(debug=True)
+    app.run(host="0.0.0.0", port=5000, debug=False)
+
+    
